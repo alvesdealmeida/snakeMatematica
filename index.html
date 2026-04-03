@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🐍 Snake Matemático</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
@@ -23,6 +23,14 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  /* ── BLOQUEIO PARA PC ── */
+  #pc-blocker {
+    position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; color: white; padding: 20px; font-family: 'Press Start 2P';
+  }
+  @media (min-width: 1025px) { #pc-blocker { display: flex; } }
+
   body {
     background: var(--bg);
     font-family: 'Nunito', sans-serif;
@@ -35,7 +43,6 @@
     overflow-x: hidden;
   }
 
-  /* Subtle star bg */
   body::before {
     content: '';
     position: fixed;
@@ -150,23 +157,6 @@
     text-shadow: 0 0 10px var(--orange);
   }
 
-  .controls-hint {
-    font-size: 10px;
-    color: var(--dim);
-    line-height: 1.8;
-    text-align: center;
-    border-top: 1px solid var(--border);
-    padding-top: 10px;
-  }
-  .controls-hint kbd {
-    background: var(--border);
-    color: var(--white);
-    border-radius: 4px;
-    padding: 1px 5px;
-    font-size: 9px;
-    font-family: monospace;
-  }
-
   /* ── Center area ── */
   .center-area {
     display: flex;
@@ -175,6 +165,12 @@
     flex: 1;
     max-width: 440px;
   }
+
+  /* CRONÔMETRO BARRA */
+  .timer-container {
+    width: 100%; height: 6px; background: #1a1a44; border-radius: 3px; overflow: hidden; margin-bottom: -5px;
+  }
+  #timer-bar { width: 100%; height: 100%; background: var(--blue); transition: width 0.1s linear; }
 
   .question-bar {
     background: linear-gradient(135deg, #0d0d2e, #1a1a44);
@@ -218,7 +214,6 @@
     image-rendering: pixelated;
   }
 
-  /* Feedback floating text */
   .feedback-text {
     font-family: 'Press Start 2P', monospace;
     font-size: 13px;
@@ -234,7 +229,6 @@
     white-space: nowrap;
   }
 
-  /* ── Overlay ── */
   .overlay {
     position: absolute;
     inset: 0;
@@ -245,20 +239,6 @@
     justify-content: center;
     gap: 16px;
     z-index: 10;
-  }
-
-  .overlay h2 {
-    font-family: 'Press Start 2P', monospace;
-    font-size: clamp(11px, 2.8vw, 17px);
-    text-align: center;
-    line-height: 1.8;
-  }
-  .overlay p {
-    color: var(--dim);
-    font-size: 14px;
-    text-align: center;
-    max-width: 270px;
-    line-height: 1.7;
   }
 
   .diff-btns {
@@ -287,16 +267,6 @@
   .diff-hard   { background: #330d18; color: var(--red);    border-color: var(--red); }
   .diff-hard:hover   { background: var(--red);    color: #fff; transform: scale(1.04); }
 
-  .score-big {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 28px;
-    color: var(--yellow);
-    text-shadow: 0 0 20px var(--yellow);
-  }
-  .score-sub { color: var(--dim); font-size: 12px; margin-top: 4px; }
-  .score-record { color: var(--purple); font-size: 12px; margin-top: 6px; }
-
-  /* ── Mobile bottom controls ── */
   .mobile-controls {
     display: none;
     margin-top: 14px;
@@ -316,10 +286,8 @@
     display: flex; align-items: center; justify-content: center;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    transition: background 0.1s, transform 0.1s;
     color: var(--white);
   }
-  .mc-btn:active { background: var(--border); transform: scale(0.94); }
 
   @media (max-width: 620px) {
     .side-panel { display: none; }
@@ -331,12 +299,16 @@
 </head>
 <body>
 
+<div id="pc-blocker">
+  <div style="font-size: 40px;">📱</div>
+  <p style="margin-top:20px; font-size:12px; line-height:1.6">JOGO EXCLUSIVO PARA<br>DISPOSITIVOS MÓVEIS</p>
+</div>
+
 <h1>🐍 SNAKE MATEMÁTICO</h1>
 <div class="subtitle">Come a resposta certa e cresça!</div>
 
 <div class="game-wrapper">
 
-  <!-- Painel lateral esquerdo -->
   <div class="side-panel">
     <div class="stat-box">
       <div class="stat-label">Pontos</div>
@@ -358,16 +330,10 @@
       <div class="label">NÍVEL</div>
       <div class="name" id="level-name">—</div>
     </div>
-    <div class="controls-hint">
-      <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd><br>
-      ou <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><br><br>
-      <kbd>P</kbd> Pausar<br>
-      <kbd>R</kbd> Reiniciar
-    </div>
   </div>
 
-  <!-- Área central -->
   <div class="center-area">
+    <div class="timer-container"><div id="timer-bar"></div></div>
     <div class="question-bar">
       <div class="question-label">🧮 QUANTO É?</div>
       <div class="question-text" id="question">—</div>
@@ -377,35 +343,21 @@
       <canvas id="gameCanvas" width="440" height="396"></canvas>
       <div class="feedback-text" id="feedback"></div>
 
-      <!-- Overlay de menu -->
       <div class="overlay" id="overlay">
         <h2 style="color:var(--green)">🐍 SNAKE<br>MATEMÁTICO</h2>
         <p>Come o número <strong style="color:var(--green)">correto</strong> e cresça!<br>Evite as respostas <strong style="color:var(--red)">erradas</strong>!</p>
         <div class="diff-btns">
-          <button class="diff-btn diff-easy" onclick="startGame('easy')">
-            😊 FÁCIL
-            <br><span style="font-size:6px;opacity:.7">Adição e subtração até 20</span>
-          </button>
-          <button class="diff-btn diff-medium" onclick="startGame('medium')">
-            🤓 MÉDIO
-            <br><span style="font-size:6px;opacity:.7">Multiplicação e divisão até 100</span>
-          </button>
-          <button class="diff-btn diff-hard" onclick="startGame('hard')">
-            🔥 DIFÍCIL
-            <br><span style="font-size:6px;opacity:.7">Potências, raízes e porcentagem</span>
-          </button>
+          <button class="diff-btn diff-easy" onclick="startGame('easy')">😊 FÁCIL</button>
+          <button class="diff-btn diff-medium" onclick="startGame('medium')">🤓 MÉDIO</button>
+          <button class="diff-btn diff-hard" onclick="startGame('hard')">🔥 DIFÍCIL</button>
         </div>
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- Controles mobile -->
 <div class="mobile-controls" id="mobileControls">
-  <div class="mc-row">
-    <button class="mc-btn" id="btn-up">▲</button>
-  </div>
+  <div class="mc-row"><button class="mc-btn" id="btn-up">▲</button></div>
   <div class="mc-row">
     <button class="mc-btn" id="btn-left">◀</button>
     <button class="mc-btn" id="btn-down">▼</button>
@@ -414,157 +366,122 @@
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-//  CONFIGURAÇÃO
-// ═══════════════════════════════════════════
+// ── SISTEMA DE ÁUDIO ──
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(freq, type, duration, vol = 0.1) {
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
+}
+const SFX = {
+    correct: () => { playSound(600, 'sine', 0.2); setTimeout(() => playSound(900, 'sine', 0.2), 100); },
+    wrong: () => { playSound(150, 'sawtooth', 0.4); },
+    level: () => { [400, 500, 600, 800].forEach((f, i) => setTimeout(() => playSound(f, 'square', 0.3), i*100)); }
+};
+
+// ── CONFIGURAÇÃO ORIGINAL ──
 const canvas = document.getElementById('gameCanvas');
 const ctx    = canvas.getContext('2d');
 const COLS = 22, ROWS = 18;
 const CW = canvas.width / COLS;
 const CH = canvas.height / ROWS;
 
-let snake, dir, nextDir, items, score, lives, streak;
+let snake, dir, nextDir, items, score, lives, streak, gameLevel = 1;
 let highscore = 0, currentQ, difficulty, paused, dead, animId;
 let moveTimer = 0, moveInterval = 200, lastTime = null;
+let levelTimer, maxLevelTime = 15; // 15 segundos para responder
 
 const COLORS = {
   easy:   { head: '#00ff88', body: '#00bb66', glow: '#00ff8870' },
   medium: { head: '#ffe94d', body: '#ccaa00', glow: '#ffe94d70' },
   hard:   { head: '#ff4d6d', body: '#cc1144', glow: '#ff4d6d70' },
 };
-
 const LEVEL_NAMES = { easy: '😊 FÁCIL', medium: '🤓 MÉDIO', hard: '🔥 DIFÍCIL' };
-
 const ITEM_PALETTE = ['#4dc8ff','#ff9f43','#c084fc','#f472b6'];
 
-// ═══════════════════════════════════════════
-//  GERADOR DE QUESTÕES
-// ═══════════════════════════════════════════
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
 function generateQuestion(diff) {
   let a, b, op, answer, display;
-
   if (diff === 'easy') {
     op = Math.random() < 0.5 ? '+' : '-';
-    a  = rand(2, 18);
-    b  = op === '-' ? rand(1, a) : rand(1, 18);
+    a  = rand(2, 18); b = op === '-' ? rand(1, a) : rand(1, 18);
     answer = op === '+' ? a + b : a - b;
     display = `${a} ${op} ${b}`;
-
   } else if (diff === 'medium') {
     const ops = ['+','-','×','÷'];
     op = ops[Math.floor(Math.random() * ops.length)];
-    if (op === '×') {
-      a = rand(2, 12); b = rand(2, 12);
-      answer = a * b;
-    } else if (op === '÷') {
-      b = rand(2, 10); answer = rand(2, 10); a = b * answer;
-    } else if (op === '+') {
-      a = rand(15, 60); b = rand(15, 60); answer = a + b;
-    } else {
-      a = rand(25, 90); b = rand(1, a - 1); answer = a - b;
-    }
+    if (op === '×') { a = rand(2, 12); b = rand(2, 12); answer = a * b; }
+    else if (op === '÷') { b = rand(2, 10); answer = rand(2, 10); a = b * answer; }
+    else if (op === '+') { a = rand(15, 60); b = rand(15, 60); answer = a + b; }
+    else { a = rand(25, 90); b = rand(1, a - 1); answer = a - b; }
     display = `${a} ${op} ${b}`;
-
-  } else { // hard
-    const types = ['pow2','pow3','sqrt','pct','expr'];
+  } else {
+    const types = ['pow2','pow3','sqrt','pct'];
     const t = types[Math.floor(Math.random() * types.length)];
-    if (t === 'pow2') {
-      a = rand(2, 12); answer = a * a; display = `${a}²`;
-    } else if (t === 'pow3') {
-      a = rand(2, 6);  answer = a * a * a; display = `${a}³`;
-    } else if (t === 'sqrt') {
-      const opts = [4,9,16,25,36,49,64,81,100,121,144];
-      a = opts[Math.floor(Math.random() * opts.length)];
-      answer = Math.sqrt(a); display = `√${a}`;
-    } else if (t === 'pct') {
-      const pcts = [10,20,25,50];
-      b = pcts[Math.floor(Math.random() * pcts.length)];
-      a = [40,60,80,100,120,200][Math.floor(Math.random()*6)];
-      answer = (a * b) / 100; display = `${b}% de ${a}`;
-    } else {
-      a = rand(2,9); b = rand(2,9); const c = rand(1,9);
-      answer = a * b + c; display = `${a}×${b}+${c}`;
-    }
+    if (t === 'pow2') { a = rand(2, 12); answer = a * a; display = `${a}²`; }
+    else if (t === 'sqrt') { const opts = [16,25,36,49,64,81,100]; a = opts[rand(0,6)]; answer = Math.sqrt(a); display = `√${a}`; }
+    else if (t === 'pct') { b = 50; a = rand(2,10)*10; answer = (a*b)/100; display = `${b}% de ${a}`; }
+    else { a = rand(2,5); b = rand(2,5); answer = a*b+2; display = `${a}×${b}+2`; }
   }
   return { display, answer: Math.round(answer) };
 }
 
-function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
 function generateWrongAnswers(correct) {
   const set = new Set();
-  let attempts = 0;
-  while (set.size < 3 && attempts < 100) {
-    attempts++;
-    let off = rand(1, Math.max(8, Math.ceil(correct * 0.3)));
-    if (Math.random() < 0.5) off = -off;
-    const w = correct + off;
-    if (w !== correct && w >= 0) set.add(w);
+  while (set.size < 3) {
+    let off = rand(1, 5); if (Math.random() < 0.5) off = -off;
+    const w = correct + off; if (w !== correct && w >= 0) set.add(w);
   }
   return [...set];
 }
 
-// ═══════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════
 function freeCell(exclude = []) {
-  const occ = new Set([
-    ...snake.map(s => `${s.x},${s.y}`),
-    ...exclude.map(e => `${e.x},${e.y}`)
-  ]);
-  let cell, tries = 0;
-  do {
-    cell = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
-    tries++;
-  } while (occ.has(`${cell.x},${cell.y}`) && tries < 300);
+  const occ = new Set([...snake.map(s => `${s.x},${s.y}`), ...exclude.map(e => `${e.x},${e.y}`)]);
+  let cell; do { cell = { x: rand(0, COLS-1), y: rand(0, ROWS-1) }; } while (occ.has(`${cell.x},${cell.y}`));
   return cell;
 }
 
 function spawnItems() {
   const q = generateQuestion(difficulty);
   currentQ = q;
+  levelTimer = maxLevelTime;
   document.getElementById('question').textContent = q.display + ' = ?';
   const wrongs = generateWrongAnswers(q.answer);
-  const all = [
-    { val: q.answer, correct: true },
-    ...wrongs.map(w => ({ val: w, correct: false }))
-  ].sort(() => Math.random() - 0.5);
+  const all = [{ val: q.answer, correct: true }, ...wrongs.map(w => ({ val: w, correct: false }))].sort(() => Math.random() - 0.5);
   items = [];
-  all.forEach(a => {
-    const pos = freeCell(items);
-    items.push({ ...pos, val: a.val, correct: a.correct });
-  });
+  all.forEach(a => { const pos = freeCell(items); items.push({ ...pos, val: a.val, correct: a.correct }); });
 }
 
 function updateUI() {
   document.getElementById('score').textContent = score;
   document.getElementById('highscore').textContent = highscore;
   document.getElementById('streak').textContent = streak;
-  document.getElementById('lives').textContent =
-    '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, 3 - lives));
+  document.getElementById('lives').textContent = '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, 3 - lives));
 }
 
-// ═══════════════════════════════════════════
-//  GAME LOOP
-// ═══════════════════════════════════════════
 function startGame(diff) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   difficulty = diff;
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('level-name').textContent = LEVEL_NAMES[diff];
-
-  snake   = [{ x:11, y:9 }, { x:10, y:9 }, { x:9, y:9 }];
-  dir     = { x:1, y:0 };
-  nextDir = { x:1, y:0 };
-  score = 0; lives = 3; streak = 0;
+  snake = [{ x:11, y:9 }, { x:10, y:9 }, { x:9, y:9 }];
+  dir = { x:1, y:0 }; nextDir = { x:1, y:0 };
+  score = 0; lives = 3; streak = 0; gameLevel = 1;
   highscore = parseInt(localStorage.getItem('snakeHS_' + diff) || '0');
   paused = false; dead = false;
   moveInterval = diff === 'easy' ? 210 : diff === 'medium' ? 165 : 130;
   moveTimer = 0;
-  updateUI();
-  spawnItems();
+  updateUI(); spawnItems();
   if (animId) cancelAnimationFrame(animId);
-  lastTime = null;
-  animId = requestAnimationFrame(loop);
+  lastTime = null; animId = requestAnimationFrame(loop);
 }
 
 function loop(ts) {
@@ -572,11 +489,12 @@ function loop(ts) {
   const dt = ts - lastTime;
   lastTime = ts;
   if (!paused && !dead) {
+    levelTimer -= dt/1000;
+    document.getElementById('timer-bar').style.width = (levelTimer/maxLevelTime)*100 + "%";
+    if(levelTimer <= 0) { loseLife("TEMPO ESGOTADO!"); }
+
     moveTimer += dt;
-    if (moveTimer >= moveInterval) {
-      moveTimer = 0;
-      update();
-    }
+    if (moveTimer >= moveInterval) { moveTimer = 0; update(); }
   }
   draw();
   if (!dead) animId = requestAnimationFrame(loop);
@@ -584,51 +502,40 @@ function loop(ts) {
 
 function update() {
   dir = { ...nextDir };
-  const head = {
-    x: (snake[0].x + dir.x + COLS) % COLS,
-    y: (snake[0].y + dir.y + ROWS) % ROWS
-  };
-  // Self collision
-  if (snake.some(s => s.x === head.x && s.y === head.y)) {
-    loseLife(); return;
-  }
+  const head = { x: (snake[0].x + dir.x + COLS) % COLS, y: (snake[0].y + dir.y + ROWS) % ROWS };
+  if (snake.some(s => s.x === head.x && s.y === head.y)) { loseLife("COLISÃO!"); return; }
   snake.unshift(head);
 
   const hit = items.findIndex(i => i.x === head.x && i.y === head.y);
   if (hit !== -1) {
     const item = items[hit];
     if (item.correct) {
-      const mult = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
-      const pts  = 10 * (streak + 1) * mult;
-      score += pts;
-      streak++;
-      if (score > highscore) {
-        highscore = score;
-        localStorage.setItem('snakeHS_' + difficulty, highscore);
+      SFX.correct();
+      score += 10 * (streak + 1); streak++;
+      if (score > highscore) { highscore = score; localStorage.setItem('snakeHS_' + difficulty, highscore); }
+      
+      // Premiação por progresso
+      if (score % 50 === 0) { 
+        gameLevel++; lives = Math.min(lives + 1, 3); SFX.level();
+        showFeedback("LEVEL UP! +❤️", "var(--purple)");
+      } else {
+        showFeedback('✓ CORRETO', '#00ff88');
       }
-      showFeedback('✓ +' + pts, '#00ff88');
-      updateUI();
-      spawnItems();
+      updateUI(); spawnItems();
     } else {
-      snake.pop();
-      streak = 0;
-      showFeedback('✗ ERRADO!', '#ff4d6d');
-      updateUI();
-      loseLife();
-      return;
+      loseLife("ERRADO!");
     }
-  } else {
-    snake.pop();
-  }
+  } else { snake.pop(); }
 }
 
-function loseLife() {
-  lives--;
+function loseLife(msg) {
+  SFX.wrong();
+  lives--; streak = 0;
+  showFeedback(msg, '#ff4d6d');
   updateUI();
   if (lives <= 0) { gameOver(); return; }
-  snake   = [{ x:11, y:9 }, { x:10, y:9 }, { x:9, y:9 }];
-  dir     = { x:1, y:0 };
-  nextDir = { x:1, y:0 };
+  snake = [{ x:11, y:9 }, { x:10, y:9 }, { x:9, y:9 }];
+  dir = { x:1, y:0 }; nextDir = { x:1, y:0 };
   spawnItems();
 }
 
@@ -636,214 +543,66 @@ function gameOver() {
   dead = true;
   const ov = document.getElementById('overlay');
   ov.style.display = 'flex';
-  ov.innerHTML = `
-    <h2 style="color:var(--red)">💀 FIM DE JOGO!</h2>
-    <div style="text-align:center">
-      <div class="score-big">${score}</div>
-      <div class="score-sub">pontos conquistados</div>
-      <div class="score-record">🏆 Recorde: ${highscore}</div>
-    </div>
-    <div class="diff-btns">
-      <button class="diff-btn diff-${difficulty}" onclick="startGame('${difficulty}')">🔄 JOGAR DE NOVO</button>
-      <button class="diff-btn diff-medium" onclick="showMenu()">📋 ESCOLHER NÍVEL</button>
-    </div>
-  `;
-}
-
-function showMenu() {
-  const ov = document.getElementById('overlay');
-  ov.style.display = 'flex';
-  ov.innerHTML = `
-    <h2 style="color:var(--green)">🐍 SNAKE<br>MATEMÁTICO</h2>
-    <p>Come o número <strong style="color:var(--green)">correto</strong> e cresça!<br>Evite as respostas <strong style="color:var(--red)">erradas</strong>!</p>
-    <div class="diff-btns">
-      <button class="diff-btn diff-easy"   onclick="startGame('easy')">😊 FÁCIL<br><span style="font-size:6px;opacity:.7">Adição e subtração até 20</span></button>
-      <button class="diff-btn diff-medium" onclick="startGame('medium')">🤓 MÉDIO<br><span style="font-size:6px;opacity:.7">Multiplicação e divisão até 100</span></button>
-      <button class="diff-btn diff-hard"   onclick="startGame('hard')">🔥 DIFÍCIL<br><span style="font-size:6px;opacity:.7">Potências, raízes e porcentagem</span></button>
-    </div>
-  `;
+  ov.innerHTML = `<h2 style="color:var(--red)">💀 FIM DE JOGO!</h2>
+    <div style="text-align:center"><div class="stat-value" style="font-size:30px">${score}</div><div style="color:var(--dim)">PONTOS</div></div>
+    <button class="diff-btn diff-easy" onclick="location.reload()">🔄 REINICIAR</button>`;
 }
 
 let feedbackTimer = null;
 function showFeedback(text, color) {
   const el = document.getElementById('feedback');
-  el.textContent = text;
-  el.style.color  = color;
-  el.style.opacity = '1';
+  el.textContent = text; el.style.color = color; el.style.opacity = '1';
   if (feedbackTimer) clearTimeout(feedbackTimer);
   feedbackTimer = setTimeout(() => { el.style.opacity = '0'; }, 900);
 }
 
-// ═══════════════════════════════════════════
-//  DRAW
-// ═══════════════════════════════════════════
 function draw() {
   const c = COLORS[difficulty] || COLORS.easy;
-
-  // BG
   ctx.fillStyle = '#08081a';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Grid dots
-  ctx.fillStyle = '#14143a';
-  for (let x = 0; x < COLS; x++) {
-    for (let y = 0; y < ROWS; y++) {
-      ctx.beginPath();
-      ctx.arc(x * CW + CW/2, y * CH + CH/2, 0.8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  // Items
   if (items) {
     items.forEach((item, i) => {
       const color = item.correct ? '#00ff88' : ITEM_PALETTE[i % ITEM_PALETTE.length];
-      const x = item.x * CW, y = item.y * CH;
-      const pad = 3;
-      const w = CW - pad*2, h = CH - pad*2;
-
-      // Glow
-      ctx.save();
-      ctx.shadowColor = color;
-      ctx.shadowBlur  = item.correct ? 22 : 12;
-
-      // Background
-      ctx.fillStyle   = item.correct ? '#002a18' : '#111130';
-      ctx.strokeStyle = color;
-      ctx.lineWidth   = item.correct ? 2.5 : 1.8;
-      ctx.beginPath();
-      roundRect(ctx, x+pad, y+pad, w, h, 6);
-      ctx.fill(); ctx.stroke();
-      ctx.restore();
-
-      // Number
-      ctx.fillStyle   = color;
-      const fs = Math.min(CW, CH) * (String(item.val).length > 3 ? 0.35 : 0.45);
-      ctx.font        = `900 ${fs}px Nunito`;
-      ctx.textAlign   = 'center';
-      ctx.textBaseline= 'middle';
-      ctx.fillText(item.val, x + CW/2, y + CH/2);
+      ctx.fillStyle = color;
+      ctx.font = `900 16px Nunito`;
+      ctx.textAlign = 'center';
+      ctx.fillText(item.val, item.x * CW + CW/2, item.y * CH + CH/2 + 5);
     });
   }
 
-  // Snake body
-  for (let i = snake.length - 1; i >= 0; i--) {
-    const seg = snake[i];
-    const isHead = i === 0;
-    const px = seg.x * CW, py = seg.y * CH;
-    const pad = isHead ? 1 : 2;
-    const col = isHead ? c.head : c.body;
+  snake.forEach((seg, i) => {
+    ctx.fillStyle = i === 0 ? c.head : c.body;
+    ctx.fillRect(seg.x * CW + 1, seg.y * CH + 1, CW - 2, CH - 2);
+  });
 
-    ctx.save();
-    ctx.shadowColor = col;
-    ctx.shadowBlur  = isHead ? 18 : 6;
-    ctx.fillStyle   = col;
-    ctx.beginPath();
-    roundRect(ctx, px+pad, py+pad, CW-pad*2, CH-pad*2, isHead ? 5 : 3);
-    ctx.fill();
-    ctx.restore();
-
-    // Eyes
-    if (isHead) {
-      const ex = px + CW/2, ey = py + CH/2;
-      // Whites
-      ctx.fillStyle = '#000c';
-      ctx.beginPath(); ctx.arc(ex-4, ey-2, 3, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(ex+4, ey-2, 3, 0, Math.PI*2); ctx.fill();
-      // Pupils
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(ex-3.5, ey-2.5, 1.3, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(ex+4.5, ey-2.5, 1.3, 0, Math.PI*2); ctx.fill();
-    }
-  }
-
-  // Pause overlay
   if (paused) {
-    ctx.fillStyle = 'rgba(5,5,22,0.78)';
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle   = '#ffe94d';
-    ctx.shadowColor = '#ffe94d';
-    ctx.shadowBlur  = 20;
-    ctx.font        = "bold 15px 'Press Start 2P'";
-    ctx.textAlign   = 'center';
-    ctx.textBaseline= 'middle';
-    ctx.fillText('PAUSADO', canvas.width/2, canvas.height/2 - 14);
-    ctx.shadowBlur  = 0;
-    ctx.fillStyle   = '#6060a0';
-    ctx.font        = '13px Nunito';
-    ctx.fillText('Pressione P para continuar', canvas.width/2, canvas.height/2 + 16);
+    ctx.fillStyle = 'white';
+    ctx.font = "12px 'Press Start 2P'";
+    ctx.fillText("PAUSADO", canvas.width/2, canvas.height/2);
   }
 }
 
-// Polyfill roundRect para Safari antigo
-function roundRect(ctx, x, y, w, h, r) {
-  if (ctx.roundRect) {
-    ctx.roundRect(x, y, w, h, r);
-  } else {
-    ctx.moveTo(x+r, y);
-    ctx.lineTo(x+w-r, y);
-    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-    ctx.lineTo(x+w, y+h-r);
-    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-    ctx.lineTo(x+r, y+h);
-    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-    ctx.lineTo(x, y+r);
-    ctx.quadraticCurveTo(x, y, x+r, y);
-    ctx.closePath();
-  }
-}
-
-// ═══════════════════════════════════════════
-//  CONTROLES — Teclado
-// ═══════════════════════════════════════════
+// CONTROLES
 document.addEventListener('keydown', e => {
-  const blocked = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
-  if (blocked.includes(e.key)) e.preventDefault();
-
-  if ((e.key === 'ArrowUp'    || e.key === 'w') && dir.y !== 1)  nextDir = { x:0, y:-1 };
-  if ((e.key === 'ArrowDown'  || e.key === 's') && dir.y !== -1) nextDir = { x:0, y:1  };
-  if ((e.key === 'ArrowLeft'  || e.key === 'a') && dir.x !== 1)  nextDir = { x:-1, y:0 };
-  if ((e.key === 'ArrowRight' || e.key === 'd') && dir.x !== -1) nextDir = { x:1,  y:0 };
-  if (e.key === 'p' || e.key === 'P') paused = !paused;
-  if (e.key === 'r' || e.key === 'R') startGame(difficulty || 'easy');
+  if (['ArrowUp','w'].includes(e.key) && dir.y !== 1) nextDir = { x:0, y:-1 };
+  if (['ArrowDown','s'].includes(e.key) && dir.y !== -1) nextDir = { x:0, y:1 };
+  if (['ArrowLeft','a'].includes(e.key) && dir.x !== 1) nextDir = { x:-1, y:0 };
+  if (['ArrowRight','d'].includes(e.key) && dir.x !== -1) nextDir = { x:1, y:0 };
+  if (e.key.toLowerCase() === 'p') paused = !paused;
 });
 
-// ═══════════════════════════════════════════
-//  CONTROLES — Touch / swipe
-// ═══════════════════════════════════════════
-let touchStart = null;
-canvas.addEventListener('touchstart', e => {
-  touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-}, { passive: true });
-
-canvas.addEventListener('touchend', e => {
-  if (!touchStart) return;
-  const dx = e.changedTouches[0].clientX - touchStart.x;
-  const dy = e.changedTouches[0].clientY - touchStart.y;
-  if (Math.abs(dx) > Math.abs(dy)) {
-    if (dx >  20 && dir.x !== -1) nextDir = { x:1,  y:0 };
-    if (dx < -20 && dir.x !==  1) nextDir = { x:-1, y:0 };
-  } else {
-    if (dy >  20 && dir.y !== -1) nextDir = { x:0, y:1  };
-    if (dy < -20 && dir.y !==  1) nextDir = { x:0, y:-1 };
-  }
-  touchStart = null;
-}, { passive: true });
-
-// Botões mobile
 function bindMobileBtn(id, dx, dy) {
   const btn = document.getElementById(id);
-  ['touchstart','mousedown'].forEach(evt => {
-    btn.addEventListener(evt, e => {
-      e.preventDefault();
-      if (dir.x !== -dx || dir.y !== -dy) nextDir = { x:dx, y:dy };
-    }, { passive: false });
+  btn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (dir.x !== -dx || dir.y !== -dy) nextDir = { x:dx, y:dy };
   });
 }
-bindMobileBtn('btn-up',    0, -1);
-bindMobileBtn('btn-down',  0,  1);
-bindMobileBtn('btn-left', -1,  0);
-bindMobileBtn('btn-right', 1,  0);
+bindMobileBtn('btn-up', 0, -1); bindMobileBtn('btn-down', 0, 1);
+bindMobileBtn('btn-left', -1, 0); bindMobileBtn('btn-right', 1, 0);
 </script>
 </body>
 </html>
